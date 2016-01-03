@@ -3,16 +3,55 @@
 -- Put your SQL 'create table' statements in this file; also 'create view'
 -- statements if you choose to use it.
 --
--- You can write comments in this file by starting them with two dashes, like
+-- You can write comments in this file by starting them with two dAShes, like
 -- these lines here.
-drop database tournament;
-create database tournament;
+DROP DATABASE tournament;
+CREATE DATABASE tournament;
 \c tournament;
-create table players(id serial,name text,primary key (id));
-create table matches(id serial,winner integer,looser integer,primary key (id));
-
-CREATE VIEW countgames AS select players.id,players.name,count(matches.winner) as games from players left join matches on players.id = matches.winner group by players.id union select players.id,players.name,count(matches.looser) as games from players left join matches on players.id = matches.looser group by players.id;
-CREATE VIEW countgames1 AS select id,name,sum(games) as games from countgames group by id,name;
-CREATE VIEW wingames AS select players.id,players.name,count(matches.winner) as wins from players left join matches on players.id = matches.winner group by matches.winner,players.id,players.name;
-CREATE VIEW wincountgames AS select wingames.id,wingames.name,wingames.wins,countgames1.games as matches from wingames inner join countgames1 on wingames.id = countgames1.id order by wins desc;
-CREATE VIEW swiss AS select a.id as id1,a.name as name1,b.id as id2,b.name as name2 from wincountgames a,wincountgames b where a.wins = b.wins and a.id != b.id and a.id < b.id;
+CREATE TABLE players(
+	id SERIAL,
+	name TEXT,PRIMARY KEY (id)
+	);
+CREATE TABLE matches(
+	id SERIAL,
+	winner INTEGER REFERENCES players(id) ON DELETE CASCADE,
+	looser INTEGER REFERENCES players(id) ON DELETE CASCADE,PRIMARY KEY (id)
+	);
+--
+CREATE VIEW countgames AS 
+	SELECT players.id,players.name,COUNT(matches.winner) AS games 
+	FROM players 
+	LEFT JOIN matches 
+	ON players.id = matches.winner 
+	GROUP BY players.id 
+UNION 
+	SELECT players.id,players.name,COUNT(matches.looser) AS games 
+	FROM players 
+	LEFT JOIN matches
+	ON players.id = matches.looser 
+	GROUP BY players.id;
+--
+CREATE VIEW countgames1 AS 
+	SELECT id,name,SUM(games) AS games 
+	FROM countgames
+	GROUP BY id,name;
+--
+CREATE VIEW wingames AS 
+	SELECT players.id,players.name,COUNT(matches.winner) AS wins 
+	FROM players 
+	LEFT JOIN matches ON players.id = matches.winner 
+	GROUP BY matches.winner,players.id,players.name;
+--
+CREATE VIEW wincountgames AS 
+	SELECT wingames.id,wingames.name,wingames.wins,countgames1.games AS matches 
+	FROM wingames 
+	INNER JOIN countgames1 ON wingames.id = countgames1.id 
+	ORDER BY wins DESC;
+--
+CREATE VIEW swiss AS 
+	SELECT a.id AS id1,a.name AS name1,b.id AS id2,b.name AS name2 
+	FROM wincountgames a,wincountgames b 
+	WHERE a.wins = b.wins 
+	AND a.id != b.id 
+	AND a.id < b.id;
+--
