@@ -1,6 +1,6 @@
 # Introduction
 
-Python module that uses a PostgreSQL database to keep track of players and matches in a game tournament using a swiss style tournament structure. This python moduel was built as a final project in  [udacity course - Introduction to relational databsaes](https://www.udacity.com/course/viewer#!/c-ud197)
+Python module that uses a PostgreSQL database to keep track of players and matches in a game tournament using a swiss style tournament structure. This python module was built as a final project in  [udacity course - Introduction to relational databsaes](https://www.udacity.com/course/viewer#!/c-ud197)
 
 ## Installation
 
